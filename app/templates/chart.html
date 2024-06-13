@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visulaization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <h1>Data Chart</h1>
+    <div id="ch"></div>
+</body>
+<script>
+    var data = JSON.parse('{{data | escapejs}}')
+    
+    var width = 600, height = 400
+
+    var svg = d3.select('#ch').append('svg').attr('width',width).attr('height',height)
+
+    var x_s = d3.scaleBand().domain(data.map(d => d.name)).range([0,width]).padding(0.1);
+
+    var y_s = d3.scaleLinear().domain([0,d3.max(data, d => d.value)]).range([height,0])
+
+    svg.selectAll('rect').data(data).enter().append('rect')
+    .attr('x',d => x_s(d.name))
+    .attr('y', d => y_s(d.value))
+    .attr('width', x_s.bandwidth())
+    .attr('height', d => height - y_s(d.value))
+    .attr('fill','steelblue')
+
+    svg.append('g').attr('transform','translate(0,' + height + ')')
+    .call(d3.axisBottom(x_s));
+
+    svg.append('g').call(d3.axisLeft(y_s));
+</script>
+</html>
